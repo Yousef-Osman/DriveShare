@@ -1,4 +1,4 @@
-﻿using DriveShare.Models.ViewModels;
+﻿using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

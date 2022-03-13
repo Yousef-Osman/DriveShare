@@ -1,4 +1,4 @@
-namespace DriveShare.Models.ViewModels;
+namespace DriveShare.ViewModels;
 
 public class ErrorViewModel
 {

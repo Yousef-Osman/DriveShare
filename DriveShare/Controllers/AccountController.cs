@@ -1,79 +1,85 @@
 ﻿using DriveShare.Data;
-using DriveShare.Models.ViewModels;
+using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DriveShare.Controllers
+namespace DriveShare.Controllers;
+
+public class AccountController : Controller
 {
-    public class AccountController : Controller
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
+        _signInManager = signInManager;
+        _userManager = userManager;
+    }
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        if (ModelState.IsValid)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, false);
+
+            if (result.Succeeded)
+                return RedirectToAction("Index", "MyFiles");
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View(model);
+    }
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View();
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
+            var user = new ApplicationUser()
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, true, false);
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                UserName = model.Email
+            };
 
-                if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, true);
+                return RedirectToAction("Index", "MyFiles");
             }
 
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
+            foreach (var error in result.Errors)
             {
-                var user = new ApplicationUser()
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    UserName = model.Email
-                };
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, true);
-                    return RedirectToAction("Index", "Home");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
+                ModelState.AddModelError("", error.Description);
             }
-
-            return View(model);
         }
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult Logout()
+    {
+        _signInManager.SignOutAsync();
+        return RedirectToAction("Index", "Home");
     }
 }

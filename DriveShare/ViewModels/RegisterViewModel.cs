@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DriveShare.Models.ViewModels;
+namespace DriveShare.ViewModels;
 
 public class RegisterViewModel
 {
