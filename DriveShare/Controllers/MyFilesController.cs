@@ -19,7 +19,7 @@ public class MyFilesController : Controller
     }
 
     [HttpPost]
-    public IActionResult UploadFile(FileViewModel fileViewModel)
+    public IActionResult UploadFile(UploadFileViewModel fileViewModel)
     {
         return View();
     }

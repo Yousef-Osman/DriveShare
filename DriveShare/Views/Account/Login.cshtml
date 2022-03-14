@@ -29,11 +29,9 @@
 </div>
 
 <div>
-    <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register new user</a>
+    <a class="nav-link text-primary" asp-controller="Account" asp-action="Register">Register new user</a>
 </div>
 
 @section Scripts {
-    @{
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");
-}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

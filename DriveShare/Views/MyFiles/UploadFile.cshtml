@@ -1,4 +1,4 @@
-﻿@model DriveShare.ViewModels.FileViewModel
+﻿@model DriveShare.ViewModels.UploadFileViewModel
 
 @{
     ViewData["Title"] = "UploadFile";
@@ -22,3 +22,9 @@
         </form>
     </div>
 </div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

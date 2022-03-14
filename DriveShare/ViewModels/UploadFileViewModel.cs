@@ -2,7 +2,7 @@
 
 namespace DriveShare.ViewModels;
 
-public class FileViewModel
+public class UploadFileViewModel
 {
     [Required]
     public IFormFile File { get; set; }
