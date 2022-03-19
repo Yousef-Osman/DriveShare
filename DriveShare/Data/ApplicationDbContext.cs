@@ -9,5 +9,5 @@ public class ApplicationDbContext: IdentityDbContext<ApplicationUser>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
     { }
 
-    DbSet<FileData> Files { get; set; }
+    public DbSet<FileData> Files { get; set; }
 }
