@@ -3,6 +3,7 @@ using DriveShare.Models;
 using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace DriveShare.Controllers;
@@ -20,8 +21,8 @@ public class MyFilesController : Controller
     }
     public IActionResult Index()
     {
-        var userid = GetUserId();
-        var uploads = _context.Files.Where(a => a.UserId == userid).Select(a => new FileDataViewModel()
+        var userId = GetUserId();
+        var uploads = _context.Files.Where(a => a.UserId == userId && a.IsDeleted == false).Select(a => new FileDataViewModel()
         {
             Id = a.Id,
             FileName = a.FileName,
@@ -29,8 +30,8 @@ public class MyFilesController : Controller
             ContentType = a.ContentType,
             DownloadCount = a.DownloadCount,
             Size = a.Size,
-            CreatedOn = a.CreatedOn.ToString(),
-            LastModifiedOn = a.LastModifiedOn.ToString(),
+            CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
+            LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm"): " - "
         });
 
         return View(uploads);
@@ -64,7 +65,7 @@ public class MyFilesController : Controller
             {
                 FileName = model.File.FileName,
                 FileSerial = fileSerial,
-                ContentType = extention,
+                ContentType = extention.Remove(0, 1),
                 UserId = GetUserId(),
                 Size = model.File.Length
             };
@@ -74,7 +75,7 @@ public class MyFilesController : Controller
 
             return RedirectToAction(nameof(Index));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             ModelState.AddModelError("", "An error occurred while saving the File, Please Try Again.");
         }
@@ -86,5 +87,18 @@ public class MyFilesController : Controller
     {
         var user = User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
         return user;
+    }
+
+    public async Task<IActionResult> DeleteFile([FromRoute]string id)
+    {
+        var image = await _context.Files.FindAsync(id);
+        if (image != null)
+        {
+            image.IsDeleted = true;
+            image.DeletedOn = DateTime.Now;
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 }
