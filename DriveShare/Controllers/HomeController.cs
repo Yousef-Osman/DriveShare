@@ -37,7 +37,7 @@ public class HomeController : Controller
 
     private IEnumerable<FileDataViewModel> GetAllFiles(string searchValue = null)
     {
-        var fileQuery = _context.Files.Where(a=> (searchValue != null)? a.FileName == searchValue: true).Select(a => new FileDataViewModel()
+        var fileQuery = _context.Files.Where(a=> (searchValue != null)? a.FileName.Contains(searchValue) : true).Select(a => new FileDataViewModel()
         {
             FileName = a.FileName,
             ContentType = a.ContentType,
