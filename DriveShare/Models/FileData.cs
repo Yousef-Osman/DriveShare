@@ -2,11 +2,12 @@
 
 namespace DriveShare.Models;
 
-public class FileData: BaseClass
+public class FileData : BaseClass
 {
     public string FileName { get; set; }
     public string FileSerial { get; set; }
     public string ContentType { get; set; }
+    public string Description { get; set; }
     public decimal Size { get; set; }
     public int DownloadCount { get; set; }
 
