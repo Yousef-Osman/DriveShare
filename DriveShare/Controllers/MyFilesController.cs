@@ -19,10 +19,10 @@ public class MyFilesController : Controller
         _context = context;
         _env = env;
     }
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var userId = GetUserId();
-        var uploads = _context.Files.Where(a => a.UserId == userId && a.IsDeleted == false).Select(a => new FileDataViewModel()
+        var uploads = await _context.Files.Where(a => a.UserId == userId && a.IsDeleted == false).Select(a => new FileDataViewModel()
         {
             Id = a.Id,
             FileName = a.FileName,
@@ -32,7 +32,7 @@ public class MyFilesController : Controller
             Size = a.Size,
             CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
             LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm"): " - "
-        });
+        }).ToListAsync();
 
         return View(uploads);
     }

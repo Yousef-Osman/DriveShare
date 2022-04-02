@@ -2,7 +2,25 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<style>
+    .center-div{
+        position: absolute;
+        top:45%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        width: 65%
+    }
+</style>
+
+<section>
+    <div class="center-div">
+        <div class="text-center mb-4">
+            <h1 class="mb-0">DriveShare</h1>
+            <p>Your favourate file uploader</p>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control">
+            <span class="input-group-text" id="inputGroup-sizing-default">Search</span>
+        </div>
+    </div>
+</section>

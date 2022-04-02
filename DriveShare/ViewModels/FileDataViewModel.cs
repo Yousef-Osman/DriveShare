@@ -10,6 +10,7 @@ public class FileDataViewModel
     public string FileSerial { get; set; }
     [Display(Name = "File Type")]
     public string ContentType { get; set; }
+    public string Description { get; set; }
     public decimal Size { get; set; }
     [Display(Name = "Download Count")]
     public int DownloadCount { get; set; }
