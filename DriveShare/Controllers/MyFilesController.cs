@@ -31,7 +31,7 @@ public class MyFilesController : Controller
             DownloadCount = a.DownloadCount,
             Size = a.Size,
             CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
-            LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm"): " - "
+            LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - "
         }).ToListAsync();
 
         return View(uploads);
@@ -85,18 +85,25 @@ public class MyFilesController : Controller
 
     private string GetUserId()
     {
-        var user = User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-        return user;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+        return userId;
     }
 
-    public async Task<IActionResult> DeleteFile([FromRoute]string id)
+    public async Task<IActionResult> DeleteFile(string id)
     {
         var image = await _context.Files.FindAsync(id);
-        if (image != null)
+        if (image == null || image.UserId == GetUserId())
+            return NotFound();
+
+        try
         {
             image.IsDeleted = true;
             image.DeletedOn = DateTime.Now;
             await _context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            //send error view here
         }
 
         return RedirectToAction(nameof(Index));
