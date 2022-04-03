@@ -23,30 +23,33 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult SearchFiles(string searchValue)
+    public async Task<IActionResult> SearchFiles(string searchValue)
     {
-        var files = GetAllFiles(searchValue).ToList();
+        var files = await GetAllFiles(searchValue).ToListAsync();
         return View(files);
     }
 
-    public IActionResult BrowseFiles()
+    public async Task<IActionResult> BrowseFiles()
     {
-        var files = GetAllFiles().ToList();
+        var files = await GetAllFiles().ToListAsync();
         return View(files);
     }
 
-    private IEnumerable<FileDataViewModel> GetAllFiles(string searchValue = null)
+    private IQueryable<FileDataViewModel> GetAllFiles(string searchValue = null)
     {
-        var fileQuery = _context.Files.Where(a=> (searchValue != null)? a.FileName.Contains(searchValue) : true).Select(a => new FileDataViewModel()
-        {
-            FileName = a.FileName,
-            ContentType = a.ContentType,
-            Description = a.Description,
-            DownloadCount = a.DownloadCount,
-            Size = a.Size,
-            CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
-            LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - "
-        }).OrderByDescending(a => a.CreatedOn);
+        IQueryable<FileDataViewModel> fileQuery = _context.Files.Where(a => a.IsDeleted == false && 
+            (string.IsNullOrEmpty(searchValue) ? true : a.FileName.ToLower().Contains(searchValue.ToLower())))
+            .Select(a => new FileDataViewModel()
+            {
+                FileName = a.FileName,
+                FileSerial = a.FileSerial,
+                ContentType = a.ContentType,
+                Description = a.Description,
+                DownloadCount = a.DownloadCount,
+                Size = a.Size,
+                CreatedOn = a.CreatedOn,
+                LastModifiedOn = a.LastModifiedOn
+            }).OrderByDescending(a => a.CreatedOn).AsQueryable();
 
         return fileQuery;
     }

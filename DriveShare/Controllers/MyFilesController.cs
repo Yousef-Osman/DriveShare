@@ -30,8 +30,10 @@ public class MyFilesController : Controller
             ContentType = a.ContentType,
             DownloadCount = a.DownloadCount,
             Size = a.Size,
-            CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
-            LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - "
+            CreatedOn = a.CreatedOn,
+            LastModifiedOn = a.LastModifiedOn
+            //CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
+            //LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - "
         }).ToListAsync();
 
         return View(uploads);

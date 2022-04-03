@@ -59,10 +59,10 @@
                     @Html.DisplayFor(modelItem => item.DownloadCount)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                    @Html.DisplayFor(modelItem => item.CreatedOn.ToString("dd-MMM-yyyy HH:mm"))
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastModifiedOn)
+                    @Html.DisplayFor(modelItem => item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")
                 </td>
                 <td>
                     @*<a class="btn btn-danger cursor-pointer" onclick="openModal(@item.Id)"><i class="fas fa-trash-alt text-white"></i></a>*@

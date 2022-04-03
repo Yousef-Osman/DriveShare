@@ -4,7 +4,7 @@
     ViewData["Title"] = "SearchFiles";
 }
 
-<h1>Search Result</h1>
+<h4 class="text-secondary my-5">Search Result</h4>
 
 @if (@Model.Count() < 1)
 {
@@ -61,10 +61,10 @@ else
                     @Html.DisplayFor(modelItem => item.DownloadCount)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedOn)
+                    @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm"))
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastModifiedOn)
+                    @(item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")
                 </td>
             </tr>
     }

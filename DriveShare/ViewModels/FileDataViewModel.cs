@@ -15,7 +15,7 @@ public class FileDataViewModel
     [Display(Name = "Download Count")]
     public int DownloadCount { get; set; }
     [Display(Name = "Date Created")]
-    public string CreatedOn { get; set; }
+    public DateTime CreatedOn { get; set; }
     [Display(Name = "Last Modified")]
-    public string LastModifiedOn { get; set; }
+    public DateTime? LastModifiedOn { get; set; }
 }

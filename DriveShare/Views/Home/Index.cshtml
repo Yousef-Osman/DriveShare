@@ -3,10 +3,10 @@
 }
 
 <style>
-    .center-div-home{
+    .center-div-home {
         position: absolute;
-        top:45%;
-        left:50%;
+        top: 45%;
+        left: 50%;
         transform: translate(-50%, -50%);
         width: 65%
     }
@@ -18,9 +18,11 @@
             <h1 class="mb-0">DriveShare</h1>
             <p>Your favourate file uploader</p>
         </div>
-        <div class="input-group">
-            <input type="text" class="form-control">
-            <span class="input-group-text" id="inputGroup-sizing-default">Search</span>
-        </div>
+        <form method="post" asp-action="SearchFiles">
+            <div class="input-group">
+                <input type="text" class="form-control" name="SearchValue">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
     </div>
 </section>
