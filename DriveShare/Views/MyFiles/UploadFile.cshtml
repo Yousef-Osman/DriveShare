@@ -4,7 +4,7 @@
     ViewData["Title"] = "UploadFile";
 }
 
-<h1>Upload File</h1>
+<h3>Upload File</h3>
 
 <hr />
 <div class="row">
@@ -12,19 +12,28 @@
         <form asp-action="UploadFile" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="File" class="control-label"></label>
-                <input asp-for="File" class="form-control" type="file"/>
+                @*<label asp-for="File" class="control-label"></label>*@
+                <input asp-for="File" class="form-control" type="file" id="selectFileInput"/>
                 <span asp-validation-for="File" class="text-danger"></span>
             </div>
             <div class="form-group mt-3">
-                <input type="submit" value="Upload" class="btn btn-primary" />
+                <input type="submit" value="Upload" class="btn btn-primary" id="submitBtn" disabled="true"/>
+                <input type="button" value="Back to list" onclick="selectFile()" class="btn btn-outline-secondary" />
             </div>
         </form>
     </div>
 </div>
 
 
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function selectFile(){
+            alert("working");
+            let selectFileInput = document.getElementById('selectFileInput');
+            let submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = (selectFileInput.files.length > 0) ?  false : true;
+        }
+    </script>
 }
