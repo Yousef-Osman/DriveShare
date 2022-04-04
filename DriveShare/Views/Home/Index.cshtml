@@ -2,7 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-<style>
+@*<style>
     .center-div-home {
         position: absolute;
         top: 45%;
@@ -10,19 +10,21 @@
         transform: translate(-50%, -50%);
         width: 65%
     }
-</style>
+</style>*@
 
 <section>
-    <div class="center-div-home">
+    <div class="center-div-45">
         <div class="text-center mb-4">
             <h1 class="mb-0">DriveShare</h1>
             <p>Your favourate file uploader</p>
         </div>
-        <form method="post" asp-action="SearchFiles">
-            <div class="input-group">
-                <input type="text" class="form-control" name="SearchValue">
-                <button class="btn btn-primary" type="submit">Search</button>
-            </div>
-        </form>
+        <div class="d-flex justify-content-center">
+            <form method="post" asp-action="SearchFiles" class="col-12 col-lg-8 col-xl-8">
+                <div class="input-group input-group-lg">
+                    <input type="text"  class="form-control" name="SearchValue">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
     </div>
 </section>

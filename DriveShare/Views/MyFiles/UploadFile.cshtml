@@ -4,36 +4,35 @@
     ViewData["Title"] = "UploadFile";
 }
 
-<h3>Upload File</h3>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="UploadFile" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                @*<label asp-for="File" class="control-label"></label>*@
-                <input asp-for="File" class="form-control" type="file" id="selectFileInput"/>
-                <span asp-validation-for="File" class="text-danger"></span>
+<div class="container">
+    <div class="center-div-45">
+        <h3 class="text-center">Upload File</h3>
+        <form asp-controller="MyFiles" asp-action="UploadFile" enctype="multipart/form-data" method="post">
+            <div class="d-flex justify-content-center">
+                <div class="form-group col-4 my-4">
+                    <input asp-for="File" class="form-control" onchange="selectFile()" type="file" id="selectFileInput" />
+                    <span asp-validation-for="File" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group mt-3">
-                <input type="submit" value="Upload" class="btn btn-primary" id="submitBtn" disabled="true"/>
-                <input type="button" value="Back to list" onclick="selectFile()" class="btn btn-outline-secondary" />
+            <div class="d-flex justify-content-center">
+                <input type="submit" value="Upload" class="btn btn-primary me-2" id="submitBtn" disabled />
+                <input type="button" value="Back to list" class="btn btn-outline-secondary" />
             </div>
         </form>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        function selectFile(){
-            alert("working");
-            let selectFileInput = document.getElementById('selectFileInput');
-            let submitBtn = document.getElementById('submitBtn');
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script>
+    function selectFile(){
+        let selectFileInput = document.getElementById('selectFileInput');
+        let submitBtn = document.getElementById('submitBtn');
 
-            submitBtn.disabled = (selectFileInput.files.length > 0) ?  false : true;
-        }
-    </script>
+        submitBtn.disabled = (selectFileInput.files.length > 0) ? false : true;
+    }
+</script>
 }
