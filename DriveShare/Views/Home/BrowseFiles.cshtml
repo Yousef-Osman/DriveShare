@@ -17,106 +17,31 @@
 }
 else
 {
-    foreach (var item in Model)
-    {
-        <div>
-            <div class="card mb-3" style="max-width: 440px;">
-                <div class="row g-0">
-                    <div class="col-md-5">
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
+                    <div class="card">
                         @if (imageList.Contains(item.ContentType))
                         {
-                            <img src="/Uploads/@item.FileSerial" style="height: 300px;object-fit: cover;" class="img-fluid rounded-start" alt="@item.FileName" />
+                            <img src="/Uploads/@item.FileSerial" class="card-img-top" alt="@item.FileName" />
                         }
-                    </div>
-                    <div class="col-md-7">
-                        <div class="card-body">
+                        else
+                        {
+                            <img src="/images/Site Backgrounds/abstract.jpg" class="card-img-top" alt="@item.FileName" />
+                        }
+                        <div class="card-body d-flex flex-column text-center">
                             <h5 class="card-title">@item.FileName</h5>
                             <p class="card-text">@item.Description</p>
                             <p class="card-text"><small class="text-muted">Created on @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm")</small></p>
-                            <p class="card-text"><small class="text-muted">Last updated @(item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")</small></p>
-                        </div>
-                        <div class="card-footer">
-                            <small class="text-muted">Download count @item.DownloadCount</small>
-                            <button class="btn btn-primary">Download</button>
+                            <div class="row justify-content-center mx-1 mt-auto">
+                                <a href="#" class="btn btn-outline-primary">Download</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="card" style="width: 18rem;">
-            <img src="..." class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-        </div>
-
-    }
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.FileName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ContentType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Size)
-                </th>
-                <th>
-                    img
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.DownloadCount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedOn)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.LastModifiedOn)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FileName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ContentType)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Size)
-                    </td>
-                    <td>
-                        @if (imageList.Contains(item.ContentType))
-                        {
-                            <img src="/Uploads/@item.FileSerial" width="70" height="70" class="img-thumbnail" alt="@item.FileName" />
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DownloadCount)
-                    </td>
-                    <td>
-                        @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm"))
-                    </td>
-                    <td>
-                        @(item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")
-                    </td>
-                </tr>
             }
-        </tbody>
-    </table>
+        </div>
+    </div>
 }

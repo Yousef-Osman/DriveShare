@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "SearchFiles";
+    string[] imageList = { "png", "jpg", "jpeg", "gif", "tif", "tiff", "bmp", "ico", "Webp" };
 }
 
 <h4 class="text-secondary my-5">Search Result</h4>
@@ -16,58 +17,32 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.FileName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ContentType)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Size)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.DownloadCount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedOn)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.LastModifiedOn)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FileName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ContentType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Size)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DownloadCount)
-                </td>
-                <td>
-                    @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm"))
-                </td>
-                <td>
-                    @(item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
+                    <div class="card">
+                        @if (imageList.Contains(item.ContentType))
+                        {
+                            <img src="/Uploads/@item.FileSerial" class="card-img-top" alt="@item.FileName" />
+                        }
+                        else
+                        {
+                            <img src="/images/Site Backgrounds/abstract.jpg" class="card-img-top" alt="@item.FileName" />
+                        }
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title">@item.FileName</h5>
+                            <p class="card-text">@item.Description</p>
+                            <p class="card-text"><small class="text-muted">Created on @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm")</small></p>
+                            <div class="row justify-content-center mx-1 mt-auto">
+                                <a href="#" class="btn btn-outline-primary">Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 }
+

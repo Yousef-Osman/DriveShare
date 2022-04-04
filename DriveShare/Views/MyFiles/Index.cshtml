@@ -11,8 +11,8 @@
     <a class="btn btn-success" asp-action="UploadFile">Upload File</a>
 </div>
 
-<table class="table">
-    <thead>
+<table class="table table-striped">
+    <thead class="table-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.FileName)
@@ -50,6 +50,10 @@
                     @if (imageList.Contains(item.ContentType))
                     {
                         <img src="/Uploads/@item.FileSerial" width="70" height="70" class="img-thumbnail" alt="@item.FileName" />
+                    }
+                    else
+                    {
+                        <img src="/images/Site Backgrounds/abstract.jpg" width="70" height="70" class="img-thumbnail" alt="@item.FileName" />
                     }
                 </td>
                 <td>
@@ -95,41 +99,41 @@
 </div>
 
 @*@section scripts{
-<script>
+    <script>
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        document.getElementsByClassName('deleteBtn').addEventListener("click", function(e){
-            let fileId = e.value;
-            console.log(fileId);
-        });
+    document.getElementsByClassName('deleteBtn').addEventListener("click", function(e){
+    let fileId = e.value;
+    console.log(fileId);
+    });
 
-        function openModal(id){
-            console.log('working');
-            console.log(id);
+    function openModal(id){
+    console.log('working');
+    console.log(id);
 
-            document.getElementById('confirm-delete-btn').value = id;
-            document.getElementById('deleteModal').modal('show');
-        }
+    document.getElementById('confirm-delete-btn').value = id;
+    document.getElementById('deleteModal').modal('show');
+    }
 
-        function deleteFile(fileId){
-            fetch('/MyFiles/DeleteFile', {
-                headers:{'Content-Type': 'application/json'},
-                method: 'Delete'
-                //credentials: 'Include'
-                //body: JSON.stringify({id: fileId})
-            }).then(response =>{
-                if(! response.ok)
-                    alert('something went wrong please try again.');
+    function deleteFile(fileId){
+    fetch('/MyFiles/DeleteFile', {
+    headers:{'Content-Type': 'application/json'},
+    method: 'Delete'
+    //credentials: 'Include'
+    //body: JSON.stringify({id: fileId})
+    }).then(response =>{
+    if(! response.ok)
+    alert('something went wrong please try again.');
 
-                return response.json();
-            }).then(json =>{
-                alert('File Deleted Successfully');
-            }).catch(error => {
-                alert(error);
-            })
-        }
+    return response.json();
+    }).then(json =>{
+    alert('File Deleted Successfully');
+    }).catch(error => {
+    alert(error);
+    })
+    }
     }, false);
-</script>
-}
+    </script>
+    }
 *@
