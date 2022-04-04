@@ -57,7 +57,7 @@
                     }
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Size)
+                    @(item.Size /1024 < 1024 ? $"{Math.Round(item.Size /1024)} KB": $"{Math.Round(item.Size/(1024*1024))} MB")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DownloadCount)
