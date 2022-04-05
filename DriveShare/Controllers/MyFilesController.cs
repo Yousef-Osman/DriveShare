@@ -91,10 +91,12 @@ public class MyFilesController : Controller
         return userId;
     }
 
-    public async Task<IActionResult> DeleteFile(string id)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteFile([FromBody] FileData file)
     {
-        var image = await _context.Files.FindAsync(id);
-        if (image == null || image.UserId == GetUserId())
+
+        var image = await _context.Files.FindAsync(file.Id);
+        if (image == null || image.UserId != GetUserId())
             return NotFound();
 
         try
@@ -105,9 +107,9 @@ public class MyFilesController : Controller
         }
         catch (Exception)
         {
-            //send error view here
-        }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }     
 
-        return RedirectToAction(nameof(Index));
+        return Json(new { RedirectUrl = "/MyFiles/Index"});
     }
 }
