@@ -41,6 +41,7 @@ public class HomeController : Controller
             (string.IsNullOrEmpty(searchValue) ? true : a.FileName.ToLower().Contains(searchValue.ToLower())))
             .Select(a => new FileDataViewModel()
             {
+                Id = a.Id,
                 FileName = a.FileName,
                 FileSerial = a.FileSerial,
                 ContentType = a.ContentType,
@@ -52,6 +53,16 @@ public class HomeController : Controller
             }).OrderByDescending(a => a.CreatedOn).AsQueryable();
 
         return fileQuery;
+    }
+
+    public IActionResult DownloadFile(string id)
+    {
+        var file = _context.Files.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == false && a.IsPrivate == false);
+
+        if (file == null)
+            return NotFound();
+
+        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
