@@ -10,34 +10,40 @@ public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<HomeController> _logger;
+    private readonly IWebHostEnvironment _env;
 
     public HomeController(ApplicationDbContext context,
-                          ILogger<HomeController> logger)
+                          ILogger<HomeController> logger,
+                          IWebHostEnvironment env)
     {
         _context = context;
         _logger = logger;
+        _env = env;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var files = await GetAllFiles().OrderByDescending(a => a.LastDownloaded).ThenBy(a => a.DownloadCount).ToListAsync();
+        return View(files);
     }
 
     public async Task<IActionResult> SearchFiles(string searchValue)
     {
-        var files = await GetAllFiles(searchValue).ToListAsync();
+        var files = await GetAllFiles(searchValue).OrderByDescending(a => a.CreatedOn).ToListAsync();
         return View(files);
     }
 
     public async Task<IActionResult> BrowseFiles()
     {
-        var files = await GetAllFiles().ToListAsync();
+        var files = await GetAllFiles().OrderByDescending(a => a.CreatedOn).ToListAsync();
         return View(files);
     }
 
+
+
     private IQueryable<FileDataViewModel> GetAllFiles(string searchValue = null)
     {
-        IQueryable<FileDataViewModel> fileQuery = _context.Files.Where(a => a.IsDeleted == false && 
+        IQueryable<FileDataViewModel> fileQuery = _context.Files.Where(a => a.IsDeleted == false &&
             (string.IsNullOrEmpty(searchValue) ? true : a.FileName.ToLower().Contains(searchValue.ToLower())))
             .Select(a => new FileDataViewModel()
             {
@@ -49,20 +55,40 @@ public class HomeController : Controller
                 DownloadCount = a.DownloadCount,
                 Size = a.Size,
                 CreatedOn = a.CreatedOn,
-                LastModifiedOn = a.LastModifiedOn
-            }).OrderByDescending(a => a.CreatedOn).AsQueryable();
+                LastModifiedOn = a.LastModifiedOn,
+                LastDownloaded = a.LastDownloaded
+            }).AsQueryable();
 
         return fileQuery;
     }
 
-    public IActionResult DownloadFile(string id)
+    public async Task<IActionResult> DownloadFile(string id)
     {
-        var file = _context.Files.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == false && a.IsPrivate == false);
+        try
+        {
+            var file = await _context.Files.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == false && a.IsPrivate == false);
 
-        if (file == null)
-            return NotFound();
+            if (file == null)
+                return NotFound();
 
-        return View();
+            file.DownloadCount++;
+            file.LastDownloaded = DateTime.Now;
+
+            _context.Update(file);
+            _context.SaveChanges();
+
+            Response.Headers.Add("Expires", DateTime.Now.AddDays(-3).ToLongDateString());
+            Response.Headers.Add("Cache-Control", "no-cache");
+
+            var filePath = Path.Combine(_env.WebRootPath, "Uploads", file.FileSerial);
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            return File(fileBytes, "application/octet-stream", file.FileName);
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

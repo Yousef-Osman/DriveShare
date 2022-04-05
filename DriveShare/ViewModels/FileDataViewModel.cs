@@ -18,4 +18,5 @@ public class FileDataViewModel
     public DateTime CreatedOn { get; set; }
     [Display(Name = "Last Modified")]
     public DateTime? LastModifiedOn { get; set; }
+    public DateTime? LastDownloaded { get; set; }
 }

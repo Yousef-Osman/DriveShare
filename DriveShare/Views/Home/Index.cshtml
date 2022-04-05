@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<DriveShare.ViewModels.FileDataViewModel>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -13,7 +15,7 @@
 </style>*@
 
 <section>
-    <div class="center-div-45">
+    <div class="my-5">
         <div class="text-center mb-4">
             <h1 class="mb-0">DriveShare</h1>
             <p>Your favourate file uploader</p>
@@ -27,4 +29,6 @@
             </form>
         </div>
     </div>
+
+    <partial name="_FileCardsPartial" model="Model"/>
 </section>
