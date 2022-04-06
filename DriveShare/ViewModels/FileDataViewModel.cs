@@ -5,18 +5,21 @@ namespace DriveShare.ViewModels;
 public class FileDataViewModel
 {
     public string Id { get; set; }
-    [Display(Name ="File Name")]
+    [Display(Name ="FileName")]
     public string FileName { get; set; }
     public string FileSerial { get; set; }
-    [Display(Name = "File Type")]
+    [Display(Name = "FileType")]
     public string ContentType { get; set; }
+    [Display(Name = "Description")]
     public string Description { get; set; }
+    [Display(Name = "Size")]
     public decimal Size { get; set; }
-    [Display(Name = "Download Count")]
+    [Display(Name = "DownloadCount")]
     public int DownloadCount { get; set; }
-    [Display(Name = "Date Created")]
+    [Display(Name = "DateCreated")]
     public DateTime CreatedOn { get; set; }
-    [Display(Name = "Last Modified")]
+    [Display(Name = "LastModified")]
     public DateTime? LastModifiedOn { get; set; }
+    [Display(Name = "LastDownloaded")]
     public DateTime? LastDownloaded { get; set; }
 }

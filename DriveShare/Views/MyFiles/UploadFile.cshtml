@@ -4,10 +4,9 @@
     ViewData["Title"] = "UploadFile";
 }
 
-
 <div class="container">
     <div class="center-div-45">
-        <h3 class="text-center">Upload File</h3>
+        <h3 class="text-center">@Localizer["UploadFile"]</h3>
         <form asp-controller="MyFiles" asp-action="UploadFile" enctype="multipart/form-data" method="post">
             <div class="d-flex justify-content-center">
                 <div class="form-group col-4 my-4">
@@ -16,8 +15,8 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center">
-                <input type="submit" value="Upload" class="btn btn-primary me-2" id="submitBtn" disabled />
-                <input type="button" value="Back to list" class="btn btn-outline-secondary" />
+                <input type="submit" value="@Localizer["Upload"]" class="btn btn-primary me-2" id="submitBtn" disabled />
+                <a asp-controller="MyFiles" asp-action="Index" class="btn btn-outline-secondary">@Localizer["Backtolist"]</a>
             </div>
         </form>
     </div>
