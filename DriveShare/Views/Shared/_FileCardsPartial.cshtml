@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<DriveShare.ViewModels.FileDataViewModel>
+@inject IViewLocalizer Localizer
 
 @{
     string[] imageList = { "png", "jpg", "jpeg", "gif", "tif", "tiff", "bmp", "ico", "Webp" };
@@ -23,7 +24,7 @@
                         <p class="card-text">@item.Description</p>
                         <p class="card-text"><small class="text-muted">Created on @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm")</small></p>
                         <div class="row justify-content-center mx-1 mt-auto">
-                            <a asp-controller="Home" asp-action="DownloadFile" asp-route-id="@item.Id" class="btn btn-outline-primary">Download</a>
+                            <a asp-controller="Home" asp-action="DownloadFile" asp-route-id="@item.Id" class="btn btn-outline-primary">@Localizer["Download"]</a>
                         </div>
                     </div>
                 </div>

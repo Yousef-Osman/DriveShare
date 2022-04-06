@@ -1,16 +1,17 @@
 ﻿@model IEnumerable<DriveShare.ViewModels.FileDataViewModel>
+@inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = "BrowseFiles";
 }
 
-<h4 class="text-secondary my-5">Browse All Files</h4>
+<h4 class="text-secondary my-5">@Localizer["BrowseFiles"]</h4>
 
 @if (@Model.Count() < 1)
 {
     <div class="center-div">
         <div class="text-center">
-            <h3 class="text-secondary">There is no files found.</h3>
+            <h3 class="text-secondary">@Localizer["Nofiles"]</h3>
         </div>
     </div>
 }

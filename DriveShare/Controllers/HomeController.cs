@@ -1,5 +1,6 @@
 ﻿using DriveShare.Data;
 using DriveShare.ViewModels;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -25,6 +26,18 @@ public class HomeController : Controller
     {
         var files = await GetAllFiles().OrderByDescending(a => a.LastDownloaded).ThenBy(a => a.DownloadCount).ToListAsync();
         return View(files);
+    }
+
+    [HttpPost]
+    public IActionResult SetLanguage(string culture, string returnUrl)
+    {
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+        );
+
+        return LocalRedirect(returnUrl);
     }
 
     public async Task<IActionResult> SearchFiles(string searchValue)
