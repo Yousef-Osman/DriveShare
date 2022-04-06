@@ -12,14 +12,14 @@
                 <div class="card">
                     @if (imageList.Contains(item.ContentType))
                     {
-                        <img src="/Uploads/@item.FileSerial" class="card-img-top" alt="@item.FileName" />
+                        <img src="/Uploads/@item.FileSerial" class="card-img-top cursor-hover" alt="@item.FileName" />
                     }
                     else
                     {
-                        <img src="/images/Site Backgrounds/abstract.jpg" class="card-img-top" alt="@item.FileName" />
+                        <img src="/images/Site Backgrounds/abstract.jpg" class="card-img-top cursor-hover" alt="@item.FileName" />
                     }
                     <div class="card-body d-flex flex-column text-center">
-                        <h5 class="card-title">@item.FileName</h5>
+                        <h5 class="card-title text-primary">@item.FileName</h5>
                         <p class="card-text">@item.Description</p>
                         <p class="card-text"><small class="text-muted">Created on @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm")</small></p>
                         <div class="row justify-content-center mx-1 mt-auto">
