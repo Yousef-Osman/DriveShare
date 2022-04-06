@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<DriveShare.ViewModels.FileDataViewModel>
+@inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = "Home Page";
@@ -6,16 +7,16 @@
 
 @*<style>
     .center-div-home {
-        position: absolute;
-        top: 45%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 65%
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 65%
     }
-</style>*@
+    </style>*@
 
 <section>
-    <div class="my-5">
+    <div style="margin: 150px 0 150px 0;">
         <div class="text-center mb-4">
             <h1 class="mb-0">DriveShare</h1>
             <p>Your favourate file uploader</p>
@@ -23,12 +24,15 @@
         <div class="d-flex justify-content-center">
             <form method="post" asp-action="SearchFiles" class="col-12 col-lg-8 col-xl-8">
                 <div class="input-group input-group-lg">
-                    <input type="text"  class="form-control" name="SearchValue">
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <input type="text" class="form-control" name="SearchValue">
+                    <button class="btn btn-primary" type="submit">@Localizer["Search"]</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <partial name="_FileCardsPartial" model="Model"/>
+    <div>
+        <h2 class="text-center">@Localizer["PopularDownloads"]</h2>
+        <hr class="my-5"/>
+        <partial name="_FileCardsPartial" model="Model" />
+    </div>
 </section>

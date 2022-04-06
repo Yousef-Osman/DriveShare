@@ -24,7 +24,8 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var files = await GetAllFiles().OrderByDescending(a => a.LastDownloaded).ThenBy(a => a.DownloadCount).ToListAsync();
+        var files = await GetAllFiles().OrderByDescending(a => a.DownloadCount).ThenByDescending(a => a.LastDownloaded)
+                    .Take(4).ToListAsync();
         return View(files);
     }
 
