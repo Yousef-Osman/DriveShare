@@ -1,5 +1,6 @@
 ﻿using DriveShare.Data;
 using DriveShare.Models;
+using DriveShare.Repositories.Interfaces;
 using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,51 @@ public class MyFilesController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _env;
+    private readonly IFileData _fileDataRepo;
 
-    public MyFilesController(ApplicationDbContext context, IWebHostEnvironment env)
+    public MyFilesController(ApplicationDbContext context, IWebHostEnvironment env, IFileData fileDataRepo)
     {
         _context = context;
         _env = env;
+        _fileDataRepo = fileDataRepo;
     }
+
+    public async Task<IActionResult> GetFileData(string sortOrder)
+    {
+        ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        ViewData["DownloadSortParm"] = sortOrder == "download" ? "download_desc" : "download";
+
+        var files = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
+        {
+            Id = a.Id,
+            FileName = a.FileName,
+            FileSerial = a.FileSerial,
+            ContentType = a.ContentType,
+            DownloadCount = a.DownloadCount,
+            Size = a.Size,
+            CreatedOn = a.CreatedOn,
+            LastModifiedOn = a.LastModifiedOn
+        }).AsQueryable();
+
+        switch (sortOrder)
+        {
+            case "name_desc":
+                files = files.OrderByDescending(s => s.FileName);
+                break;
+            case "download":
+                files = files.OrderBy(s => s.DownloadCount);
+                break;
+            case "download_desc":
+                files = files.OrderByDescending(s => s.DownloadCount);
+                break;
+            default:
+                files = files.OrderBy(s => s.FileName);
+                break;
+        }
+
+        return View(nameof(Index) ,await files.ToListAsync());
+    }
+
     public async Task<IActionResult> Index()
     {
         var userId = GetUserId();
@@ -38,6 +78,8 @@ public class MyFilesController : Controller
 
         return View(uploads);
     }
+
+
 
     [HttpGet]
     public IActionResult UploadFile()

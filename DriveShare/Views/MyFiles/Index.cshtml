@@ -15,7 +15,10 @@
     <thead class="table-dark">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FileName)
+                <i class="fas fa-long-arrow-alt-up text-white-50"></i>
+                <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["NameSortParm"]">
+                    @Html.DisplayNameFor(model => model.FileName)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ContentType)
@@ -25,8 +28,11 @@
                 @Html.DisplayNameFor(model => model.Size)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DownloadCount)
-            </th>
+                <i class="fas fa-long-arrow-alt-down text-white-50"></i>
+                <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["DownloadSortParm"]">
+                    @Html.DisplayNameFor(model => model.DownloadCount)
+                </a>
+            </th>  
             <th>
                 @Html.DisplayNameFor(model => model.CreatedOn)
             </th>
@@ -90,8 +96,8 @@
                     <p class="text-center text-secondary fs-5">@Localizer["DeleteFileMessage"]</p>
                 </div>
                 <div class="row mb-5 justify-content-center">
-                    <input class="btn btn-danger col-4 me-1" value="@Localizer["Confirm"]" id="confirm-delete-btn"/>
-                    <input class="btn btn-outline-secondary col-4 ms-1" value="@Localizer["Cancel"]" data-bs-dismiss="modal"/>
+                    <input class="btn btn-danger col-4 me-1" value="@Localizer["Confirm"]" id="confirm-delete-btn" />
+                    <input class="btn btn-outline-secondary col-4 ms-1" value="@Localizer["Cancel"]" data-bs-dismiss="modal" />
                 </div>
             </div>
         </div>
