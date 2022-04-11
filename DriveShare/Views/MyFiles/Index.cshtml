@@ -15,7 +15,7 @@
     <thead class="table-dark">
         <tr>
             <th>
-                <i class="fas fa-long-arrow-alt-up text-white-50"></i>
+                <i class="fas @ViewData["NameSortIcon"] text-white-50"></i>
                 <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["NameSortParm"]">
                     @Html.DisplayNameFor(model => model.FileName)
                 </a>
@@ -28,13 +28,16 @@
                 @Html.DisplayNameFor(model => model.Size)
             </th>
             <th>
-                <i class="fas fa-long-arrow-alt-down text-white-50"></i>
+                <i class="fas @ViewData["DownloadSortIcon"] text-white-50"></i>
                 <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["DownloadSortParm"]">
                     @Html.DisplayNameFor(model => model.DownloadCount)
                 </a>
             </th>  
             <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
+                <i class="fas @ViewData["UploadDateSortIcon"] text-white-50"></i>
+                <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["UploadDateSortParm"]">
+                    @Html.DisplayNameFor(model => model.CreatedOn)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LastModifiedOn)

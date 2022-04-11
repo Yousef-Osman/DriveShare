@@ -1,5 +1,7 @@
 ﻿using DriveShare.Data;
+using DriveShare.Helpers;
 using DriveShare.Models;
+using DriveShare.Models.Enums;
 using DriveShare.Repositories.Interfaces;
 using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -25,8 +27,14 @@ public class MyFilesController : Controller
 
     public async Task<IActionResult> GetFileData(string sortOrder)
     {
-        ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        //flip the viewData value for the next click
+        ViewData["UploadDateSortParm"] = String.IsNullOrEmpty(sortOrder) ? "uploadDate" : "";
+        ViewData["NameSortParm"] = sortOrder == "name" ? "name_desc" : "name";
         ViewData["DownloadSortParm"] = sortOrder == "download" ? "download_desc" : "download";
+
+        ViewData["UploadDateSortIcon"] = "";
+        ViewData["NameSortIcon"] = "";
+        ViewData["DownloadSortIcon"] = "";
 
         var files = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
         {
@@ -40,19 +48,45 @@ public class MyFilesController : Controller
             LastModifiedOn = a.LastModifiedOn
         }).AsQueryable();
 
+        var sortModel = new SortModel();
+
         switch (sortOrder)
         {
+            case "name":
+                files = files.OrderBy(s => s.FileName);
+                //sortModel.SortedProperty = "FileName";
+                //sortModel.SortedOrder = SortOrder.Ascending;
+                ViewData["NameSortIcon"] = "fa-long-arrow-alt-down";
+                break;
             case "name_desc":
                 files = files.OrderByDescending(s => s.FileName);
+                //sortModel.SortedProperty = "FileName";
+                //sortModel.SortedOrder = SortOrder.Descending;
+                ViewData["NameSortIcon"] = "fa-long-arrow-alt-up";
                 break;
             case "download":
                 files = files.OrderBy(s => s.DownloadCount);
+                //sortModel.SortedProperty = "DownloadCount";
+                //sortModel.SortedOrder = SortOrder.Ascending;
+                ViewData["DownloadSortIcon"] = "fa-long-arrow-alt-down";
                 break;
             case "download_desc":
                 files = files.OrderByDescending(s => s.DownloadCount);
+                //sortModel.SortedProperty = "DownloadCount";
+                //sortModel.SortedOrder = SortOrder.Descending;
+                ViewData["DownloadSortIcon"] = "fa-long-arrow-alt-up";
                 break;
-            default:
-                files = files.OrderBy(s => s.FileName);
+            case "uploadDate":
+                files = files.OrderBy(s => s.CreatedOn);
+                //sortModel.SortedProperty = "CreatedOn";
+                //sortModel.SortedOrder = SortOrder.Ascending;
+                ViewData["UploadDateSortIcon"] = "fa-long-arrow-alt-down";
+                break;
+            default: //default is order by uploadDate desc
+                files = files.OrderByDescending(s => s.CreatedOn);
+                //sortModel.SortedProperty = "CreatedOn";
+                //sortModel.SortedOrder = SortOrder.Descending;
+                ViewData["UploadDateSortIcon"] = "fa-long-arrow-alt-up";
                 break;
         }
 
