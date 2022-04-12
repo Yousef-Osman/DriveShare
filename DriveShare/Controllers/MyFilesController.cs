@@ -23,6 +23,61 @@ public class MyFilesController : Controller
         _fileDataRepo = fileDataRepo;
     }
 
+    public IActionResult GetUploads([FromForm] int start, string[] parameters, [FromForm] int length = 10)
+    {
+        try
+        {
+            var searchValue = Request.Form["search[value]"];
+            var columnOrder = Request.Form["order[0][column]"];
+            var sortColumn = Request.Form[string.Concat("columns[", columnOrder, "][name]")];
+            var sortColumnDirection = Request.Form["order[0][dir]"];
+            var status = Convert.ToInt32(parameters[0]);
+
+            //Querying tax Documents in the database and searching for certain values if a search value is available
+            //IQueryable<Tax_Document> dbDocuments = _kPE01Context.Tax_Documents
+            //    .Where(a => (status == 0 ? true : (a.StatusId == status)) &&
+            //    (string.IsNullOrEmpty(searchValue) ? true : a.DocumentNumber.Contains(searchValue)));
+
+            var files = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
+            {
+                Id = a.Id,
+                FileName = a.FileName,
+                FileSerial = a.FileSerial,
+                ContentType = a.ContentType,
+                DownloadCount = a.DownloadCount,
+                Size = a.Size,
+                CreatedOn = a.CreatedOn,
+                LastModifiedOn = a.LastModifiedOn
+            }).AsQueryable();
+
+            //Sorting records for any given column
+            //if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            //    dbDocuments = dbDocuments.OrderBy(a => string.Concat(sortColumn, " ", sortColumnDirection));
+
+            List<FileDataViewModel> records = files.Skip(start).Take(length).ToList();
+            var totalCount = files.Count();
+
+            //create document view model list and format documents accordind to it
+            var data = new List<FileDataViewModel>();
+
+            foreach (var file in records)
+            {
+                data.Add(file);
+            }
+
+            return Json(new
+            {
+                data = data,
+                recordsFiltered = totalCount,
+                recordsTotal = totalCount
+            });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500);
+        }
+    }
+
     public async Task<IActionResult> GetFileData(string sortOrder)
     {
         ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";

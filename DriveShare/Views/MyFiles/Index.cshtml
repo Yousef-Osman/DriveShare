@@ -11,28 +11,21 @@
     <a class="btn btn-outline-success" asp-action="UploadFile">@Localizer["UploadFile"]</a>
 </div>
 
-<table class="table table-striped">
+<table class="table table-striped" id="uploadedFiles">
     <thead class="table-dark">
         <tr>
             <th>
-                <i class="fas fa-long-arrow-alt-up text-white-50"></i>
-                <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["NameSortParm"]">
-                    @Html.DisplayNameFor(model => model.FileName)
-                </a>
+                @Html.DisplayNameFor(model => model.FileName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ContentType)
             </th>
-            <th>@Localizer["Preview"]</th>
             <th>
                 @Html.DisplayNameFor(model => model.Size)
             </th>
             <th>
-                <i class="fas fa-long-arrow-alt-down text-white-50"></i>
-                <a class="text-decoration-none text-reset" asp-action="GetFileData" asp-route-sortOrder="@ViewData["DownloadSortParm"]">
-                    @Html.DisplayNameFor(model => model.DownloadCount)
-                </a>
-            </th>  
+                @Html.DisplayNameFor(model => model.DownloadCount)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.CreatedOn)
             </th>
@@ -42,45 +35,6 @@
             <th></th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FileName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ContentType)
-                </td>
-                <td>
-                    @if (imageList.Contains(item.ContentType))
-                    {
-                        <img src="/Uploads/@item.FileSerial" width="70" height="70" class="img-thumbnail" alt="@item.FileName" />
-                    }
-                    else
-                    {
-                        <img src="/images/Site Backgrounds/abstract.jpg" width="70" height="70" class="img-thumbnail" alt="@item.FileName" />
-                    }
-                </td>
-                <td>
-                    @(item.Size /1024 < 1024 ? $"{Math.Round(item.Size /1024)} KB": $"{Math.Round(item.Size/(1024*1024))} MB")
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DownloadCount)
-                </td>
-                <td>
-                    @item.CreatedOn.ToString("dd-MMM-yyyy HH:mm")
-                </td>
-                <td>
-                    @(item.LastModifiedOn.HasValue ? item.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - ")
-                </td>
-                <td>
-                    @*<a class="btn btn-danger cursor-pointer" onclick="openModal(@item.Id)" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-trash-alt text-white"></i></a>*@
-                    <a class="btn btn-danger cursor-pointer deleteBtn" id="@(item.Id)" onclick="selectFile(this.id)"><i class="fas fa-trash-alt text-white"></i></a>
-                </td>
-            </tr>
-        }
-    </tbody>
 </table>
 
 <!-- Delete Modal -->
@@ -104,40 +58,81 @@
     </div>
 </div>
 
-@section Scripts {
+@section scripts{
+<script src="~/datatables/js/jquery.dataTables.min.js"></script>
+<script src="~/datatables/js/dataTables.bootstrap4.min.js"></script>
+<script src="~/datatables/Datatable.Master.js"></script>
 <script>
-    function selectFile(id){
+    //Datatable Script
+      $(document).ready(function () {
 
-        let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'), {
-          keyboard: true
-        });
+          let selector = "#uploadedFiles";
+          let url = "/MyFiles/GetUploads";
+          let columns = [
+              { data: "fileName" },
+              { data: "contentType" },
+              { data: "size" },
+              { data: "downloadCount" },
+              { data: "createdOn" },
+              { data: "lastModifiedOn" },
+              {
+                  data: "", render: function (data, type, row) {
+                      return `<a class="btn btn-danger cursor-pointer deleteBtn" id="${row.id}" onclick="selectFile(this.id)"><i class="fas fa-trash-alt text-white"></i></a>`;
+                  }
+              },
+          ]
 
-        deleteModal.show();
+          let params = [1];
+          let dataTable = getData(selector, url, columns, params);
 
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        confirmDeleteBtn.addEventListener("click", function(e){
-            deleteModal.hide();
-            deleteFile(id);
-        });
-    }
+          //$("#documentStatus").on("change", function () {
 
-    function deleteFile(fileId){
-        fetch('/MyFiles/DeleteFile', {
-                headers:{'Content-Type': 'application/json'},
-                method: 'Delete',
-                credentials: 'include',
-                body: JSON.stringify({id: fileId}),
-        }).then(response =>{
-            if(! response.ok)
-                alert('something went wrong please try again.');
-            else
-                return response.json();
-        }).then(data =>{
-            alert('File Deleted Successfully');
-            window.location.href = data.redirectUrl;
-        }).catch(error => {
-            alert(error);
-        });
-    };
+          //    params = [$(this).val()];
+          //    dataTable.destroy();
+          //    dataTable = getData(selector, url, columns, params);
+          //})
+      });
+</script>
+
+<script>
+    //Delete Script
+      function selectFile(id){
+
+          let deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'), {
+            keyboard: true
+          });
+
+          deleteModal.show();
+
+          const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+          confirmDeleteBtn.addEventListener("click", function(e){
+              deleteModal.hide();
+              deleteFile(id);
+          });
+      }
+
+      function deleteFile(fileId){
+          fetch('/MyFiles/DeleteFile', {
+                  headers:{'Content-Type': 'application/json'},
+                  method: 'Delete',
+                  credentials: 'include',
+                  body: JSON.stringify({id: fileId}),
+          }).then(response =>{
+              if(! response.ok)
+                  alert('something went wrong please try again.');
+              else
+                  return response.json();
+          }).then(data =>{
+              alert('File Deleted Successfully');
+              window.location.href = data.redirectUrl;
+          }).catch(error => {
+              alert(error);
+          });
+      };
 </script>
 }
+
+
+@* if you recieve a can't get data row 0 column 0 to etc.. make shure that the data columns are in camel case
+    you might as well rename the columns in the view model*@
+
