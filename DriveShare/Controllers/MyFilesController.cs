@@ -1,4 +1,5 @@
-﻿using DriveShare.Data;
+﻿using DriveShare.Common;
+using DriveShare.Data;
 using DriveShare.Helpers;
 using DriveShare.Models;
 using DriveShare.Models.Enums;
@@ -23,6 +24,61 @@ public class MyFilesController : Controller
         _context = context;
         _env = env;
         _fileDataRepo = fileDataRepo;
+    }
+
+    [HttpPost("LoadTable")]
+    public async Task<IActionResult> LoadTable([FromBody] DtParameters dtParameters)
+    {
+        //https://github.com/DavidSuescunPelegay/jQuery-datatable-server-side-net-core/tree/master/src/jQueryDatatableServerSideNetCore/Models
+        var searchBy = dtParameters.Search?.Value;
+
+        // if we have an empty search then just order the results by Id ascending
+        var orderCriteria = "Id";
+        var orderAscendingDirection = true;
+
+        if (dtParameters.Order != null)
+        {
+            // in this example we just default sort on the 1st column
+            orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+            orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
+        }
+
+        var result = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
+        {
+            Id = a.Id,
+            FileName = a.FileName,
+            FileSerial = a.FileSerial,
+            Description = a.Description,
+            ContentType = a.ContentType,
+            DownloadCount = a.DownloadCount,
+            Size = a.Size,
+            CreatedOn = a.CreatedOn,
+            LastModifiedOn = a.LastModifiedOn
+        }).AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchBy))
+        {
+            result = result.Where(r => r.FileName != null && r.FileName.ToUpper().Contains(searchBy.ToUpper()) ||
+                                       r.ContentType != null && r.ContentType.ToUpper().Contains(searchBy.ToUpper()) ||
+                                       r.Description != null && r.Description.ToUpper().Contains(searchBy.ToUpper()));
+        }
+
+        result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria, DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria, DtOrderDir.Desc);
+
+        // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
+        var filteredResultsCount = await result.CountAsync();
+        //var totalResultsCount = await _context.Files.CountAsync();
+
+        return Json(new DtResult<FileDataViewModel>
+        {
+            Draw = dtParameters.Draw,
+            RecordsTotal = filteredResultsCount,
+            RecordsFiltered = filteredResultsCount,
+            Data = await result
+                .Skip(dtParameters.Start)
+                .Take(dtParameters.Length)
+                .ToListAsync()
+        });
     }
 
     public IActionResult GetUploads([FromForm] int start, string[] parameters, [FromForm] int length = 10)
