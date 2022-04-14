@@ -8,8 +8,8 @@
         info: true,
         ordering: true,
         filter: true,
-        order: [],
-        //order: dir == null ? [[1, "asc"]] : dir,
+        //order: [],
+        order: dir == null ? [[1, "asc"]] : dir,
         autoWidth: true,
         ajax: {
             url: url,

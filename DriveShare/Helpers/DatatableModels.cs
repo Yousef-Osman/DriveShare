@@ -38,7 +38,7 @@ public abstract class DtRow
     public virtual object DtRowAttr => null;
 }
 
-public class DtParameters
+public class DatatableParams
 {
     public int Draw { get; set; }
     public DtColumn[] Columns { get; set; }
@@ -51,7 +51,6 @@ public class DtParameters
            (Order[0].Dir == DtOrderDir.Desc ? " " + Order[0].Dir : string.Empty))
         : null;
     public IEnumerable<string> AdditionalValues { get; set; }
-
 }
 
 public class DtColumn

@@ -26,106 +26,65 @@ public class MyFilesController : Controller
         _fileDataRepo = fileDataRepo;
     }
 
-    [HttpPost("LoadTable")]
-    public async Task<IActionResult> LoadTable([FromBody] DtParameters dtParameters)
+    public IActionResult Index()
     {
-        //https://github.com/DavidSuescunPelegay/jQuery-datatable-server-side-net-core/tree/master/src/jQueryDatatableServerSideNetCore/Models
-        var searchBy = dtParameters.Search?.Value;
-
-        // if we have an empty search then just order the results by Id ascending
-        var orderCriteria = "Id";
-        var orderAscendingDirection = true;
-
-        if (dtParameters.Order != null)
-        {
-            // in this example we just default sort on the 1st column
-            orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
-            orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
-        }
-
-        var result = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
-        {
-            Id = a.Id,
-            FileName = a.FileName,
-            FileSerial = a.FileSerial,
-            Description = a.Description,
-            ContentType = a.ContentType,
-            DownloadCount = a.DownloadCount,
-            Size = a.Size,
-            CreatedOn = a.CreatedOn,
-            LastModifiedOn = a.LastModifiedOn
-        }).AsQueryable();
-
-        if (!string.IsNullOrEmpty(searchBy))
-        {
-            result = result.Where(r => r.FileName != null && r.FileName.ToUpper().Contains(searchBy.ToUpper()) ||
-                                       r.ContentType != null && r.ContentType.ToUpper().Contains(searchBy.ToUpper()) ||
-                                       r.Description != null && r.Description.ToUpper().Contains(searchBy.ToUpper()));
-        }
-
-        result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria, DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria, DtOrderDir.Desc);
-
-        // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
-        var filteredResultsCount = await result.CountAsync();
-        //var totalResultsCount = await _context.Files.CountAsync();
-
-        return Json(new DtResult<FileDataViewModel>
-        {
-            Draw = dtParameters.Draw,
-            RecordsTotal = filteredResultsCount,
-            RecordsFiltered = filteredResultsCount,
-            Data = await result
-                .Skip(dtParameters.Start)
-                .Take(dtParameters.Length)
-                .ToListAsync()
-        });
+        return View();
     }
 
-    public IActionResult GetUploads([FromForm] int start, string[] parameters, [FromForm] int length = 10)
+    [HttpPost]
+    public async Task<IActionResult> GetUploads([FromForm] int start, string[] parameters, [FromForm] int length = 10)
     {
         try
         {
-            var searchValue = Request.Form["search[value]"];
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
             var columnOrder = Request.Form["order[0][column]"];
             var sortColumn = Request.Form[string.Concat("columns[", columnOrder, "][name]")];
             var sortColumnDirection = Request.Form["order[0][dir]"];
-            var status = Convert.ToInt32(parameters[0]);
+            //var status = Convert.ToInt32(parameters[0]);
 
-            //Querying tax Documents in the database and searching for certain values if a search value is available
-            //IQueryable<Tax_Document> dbDocuments = _kPE01Context.Tax_Documents
-            //    .Where(a => (status == 0 ? true : (a.StatusId == status)) &&
-            //    (string.IsNullOrEmpty(searchValue) ? true : a.DocumentNumber.Contains(searchValue)));
+            //Main query to select all user active files
+            var filesQuery = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).AsQueryable();
 
-            var files = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
+            //Search query for certain values if a search value is available
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                filesQuery = filesQuery.Where(a => a.FileName.ToLower().Contains(searchValue) ||
+                                a.ContentType.ToLower().Contains(searchValue));
+            }
+
+            //Sorting records for any given column
+            //if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            //{
+            //    filesQuery = filesQuery.OrderBy(a => string.Concat(sortColumn, " ", sortColumnDirection));
+            //}
+
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            {
+                if (sortColumnDirection == "asc")
+                    filesQuery = filesQuery.OrderBy(a => a.GetType().GetProperty(sortColumn).GetValue(a));
+                else
+                    filesQuery = filesQuery.OrderByDescending(a => a.GetType().GetProperty(sortColumn).GetValue(a));
+            }
+
+            var SelectQuery = filesQuery.Select(a => new FileDataViewModel()
             {
                 Id = a.Id,
                 FileName = a.FileName,
+                Description = a.Description,
                 FileSerial = a.FileSerial,
                 ContentType = a.ContentType,
                 DownloadCount = a.DownloadCount,
                 Size = a.Size,
                 CreatedOn = a.CreatedOn,
                 LastModifiedOn = a.LastModifiedOn
-            }).AsQueryable();
+            });
 
-            //Sorting records for any given column
-            //if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-            //    dbDocuments = dbDocuments.OrderBy(a => string.Concat(sortColumn, " ", sortColumnDirection));
-
-            List<FileDataViewModel> records = files.Skip(start).Take(length).ToList();
-            var totalCount = files.Count();
-
-            //create document view model list and format documents accordind to it
-            var data = new List<FileDataViewModel>();
-
-            foreach (var file in records)
-            {
-                data.Add(file);
-            }
+            var records = await SelectQuery.Skip(start).Take(length).ToListAsync();
+            var totalCount = await SelectQuery.CountAsync();
 
             return Json(new
             {
-                data = data,
+                data = records,
                 recordsFiltered = totalCount,
                 recordsTotal = totalCount
             });
@@ -135,96 +94,6 @@ public class MyFilesController : Controller
             return StatusCode(500);
         }
     }
-
-    public async Task<IActionResult> GetFileData(string sortOrder)
-    {
-        //flip the viewData value for the next click
-        ViewData["UploadDateSortParm"] = String.IsNullOrEmpty(sortOrder) ? "uploadDate" : "";
-        ViewData["NameSortParm"] = sortOrder == "name" ? "name_desc" : "name";
-        ViewData["DownloadSortParm"] = sortOrder == "download" ? "download_desc" : "download";
-
-        ViewData["UploadDateSortIcon"] = "";
-        ViewData["NameSortIcon"] = "";
-        ViewData["DownloadSortIcon"] = "";
-
-        var files = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).Select(a => new FileDataViewModel()
-        {
-            Id = a.Id,
-            FileName = a.FileName,
-            FileSerial = a.FileSerial,
-            ContentType = a.ContentType,
-            DownloadCount = a.DownloadCount,
-            Size = a.Size,
-            CreatedOn = a.CreatedOn,
-            LastModifiedOn = a.LastModifiedOn
-        }).AsQueryable();
-
-        var sortModel = new SortModel();
-
-        switch (sortOrder)
-        {
-            case "name":
-                files = files.OrderBy(s => s.FileName);
-                //sortModel.SortedProperty = "FileName";
-                //sortModel.SortedOrder = SortOrder.Ascending;
-                ViewData["NameSortIcon"] = "fa-long-arrow-alt-down";
-                break;
-            case "name_desc":
-                files = files.OrderByDescending(s => s.FileName);
-                //sortModel.SortedProperty = "FileName";
-                //sortModel.SortedOrder = SortOrder.Descending;
-                ViewData["NameSortIcon"] = "fa-long-arrow-alt-up";
-                break;
-            case "download":
-                files = files.OrderBy(s => s.DownloadCount);
-                //sortModel.SortedProperty = "DownloadCount";
-                //sortModel.SortedOrder = SortOrder.Ascending;
-                ViewData["DownloadSortIcon"] = "fa-long-arrow-alt-down";
-                break;
-            case "download_desc":
-                files = files.OrderByDescending(s => s.DownloadCount);
-                //sortModel.SortedProperty = "DownloadCount";
-                //sortModel.SortedOrder = SortOrder.Descending;
-                ViewData["DownloadSortIcon"] = "fa-long-arrow-alt-up";
-                break;
-            case "uploadDate":
-                files = files.OrderBy(s => s.CreatedOn);
-                //sortModel.SortedProperty = "CreatedOn";
-                //sortModel.SortedOrder = SortOrder.Ascending;
-                ViewData["UploadDateSortIcon"] = "fa-long-arrow-alt-down";
-                break;
-            default: //default is order by uploadDate desc
-                files = files.OrderByDescending(s => s.CreatedOn);
-                //sortModel.SortedProperty = "CreatedOn";
-                //sortModel.SortedOrder = SortOrder.Descending;
-                ViewData["UploadDateSortIcon"] = "fa-long-arrow-alt-up";
-                break;
-        }
-
-        return View(nameof(Index) ,await files.ToListAsync());
-    }
-
-    public async Task<IActionResult> Index()
-    {
-        var userId = GetUserId();
-        var uploads = await _context.Files.Where(a => a.UserId == userId && a.IsDeleted == false).Select(a => new FileDataViewModel()
-        {
-            Id = a.Id,
-            FileName = a.FileName,
-            FileSerial = a.FileSerial,
-            ContentType = a.ContentType,
-            DownloadCount = a.DownloadCount,
-            Size = a.Size,
-            CreatedOn = a.CreatedOn,
-            LastModifiedOn = a.LastModifiedOn
-            //CreatedOn = a.CreatedOn.ToString("dd-MMM-yyyy HH:mm"),
-            //LastModifiedOn = a.LastModifiedOn.HasValue ? a.LastModifiedOn.Value.ToString("dd-MMM-yyyy HH:mm") : " - "
-        }).ToListAsync();
-
-        return View(uploads);
-    }
-
-
 
     [HttpGet]
     public IActionResult UploadFile()
@@ -295,8 +164,8 @@ public class MyFilesController : Controller
         catch (Exception)
         {
             return StatusCode(StatusCodes.Status500InternalServerError);
-        }     
+        }
 
-        return Json(new { RedirectUrl = "/MyFiles/Index"});
+        return Json(new { RedirectUrl = "/MyFiles/Index" });
     }
 }

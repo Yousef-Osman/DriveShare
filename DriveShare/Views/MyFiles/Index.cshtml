@@ -90,6 +90,15 @@
     //Datatable Script
         $(document).ready(function () {
 
+            function formateDate(oldDate){
+                if(!oldDate)    //if string is null, undefined, 0, 000, "", false
+                    return '';
+
+                let newDate = new Date(oldDate).toLocaleDateString('en-GB',{day: '2-digit', month: 'short', year: 'numeric', hour12: true}).replaceAll('/', ' ');
+                let newTime = new Date(oldDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                return `${newDate} - ${newTime}`;
+            }
+
             let selector = "#uploadedFiles";
             let url = "/MyFiles/GetUploads";
             let columns = [
@@ -97,24 +106,25 @@
                 { data: "contentType" },
                 { data: "size" },
                 { data: "downloadCount" },
-                { data: "createdOn" },
-                { data: "lastModifiedOn" },
                 {
-                    data: "", render: function (data, type, row) {
+                    data: "createdOn" ,
+                    render: function (data, type, row) { return formateDate(row.createdOn); },
+                },
+                { 
+                    data: "lastModifiedOn", 
+                    render: function (data, type, row) { return formateDate(row.lastModifiedOn); }, 
+                },
+                {
+                    data: "",
+                    render: function (data, type, row) {
                         return `<a class="btn btn-danger cursor-pointer deleteBtn" id="${row.id}" onclick="selectFile(this.id)"><i class="fas fa-trash-alt text-white"></i></a>`;
-                    }
+                    },
+                    orderable: false,
                 },
             ]
 
             let params = [1];
             let dataTable = getData(selector, url, columns, params);
-
-            //$("#documentStatus").on("change", function () {
-
-            //    params = [$(this).val()];
-            //    dataTable.destroy();
-            //    dataTable = getData(selector, url, columns, params);
-            //})
         });
 </script>
 
