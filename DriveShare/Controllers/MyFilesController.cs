@@ -37,9 +37,9 @@ public class MyFilesController : Controller
         try
         {
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
-            var columnOrder = Request.Form["order[0][column]"];
-            var sortColumn = Request.Form[string.Concat("columns[", columnOrder, "][name]")];
-            var sortColumnDirection = Request.Form["order[0][dir]"];
+            var columnOrder = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortColumn = Request.Form[string.Concat("columns[", columnOrder, "][name]")].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
             //var status = Convert.ToInt32(parameters[0]);
 
             //Main query to select all user active files
@@ -58,14 +58,6 @@ public class MyFilesController : Controller
             //    filesQuery = filesQuery.OrderBy(a => string.Concat(sortColumn, " ", sortColumnDirection));
             //}
 
-            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-            {
-                if (sortColumnDirection == "asc")
-                    filesQuery = filesQuery.OrderBy(a => a.GetType().GetProperty(sortColumn).GetValue(a));
-                else
-                    filesQuery = filesQuery.OrderByDescending(a => a.GetType().GetProperty(sortColumn).GetValue(a));
-            }
-
             var SelectQuery = filesQuery.Select(a => new FileDataViewModel()
             {
                 Id = a.Id,
@@ -78,6 +70,20 @@ public class MyFilesController : Controller
                 CreatedOn = a.CreatedOn,
                 LastModifiedOn = a.LastModifiedOn
             });
+
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            {
+                //System.Reflection.PropertyInfo prop = typeof(sortColumn).GetProperty("PropertyName");
+
+                //query = query.OrderBy(x => prop.GetValue(x, null));
+
+                if (sortColumnDirection == "asc")
+                    SelectQuery = SelectQuery.OrderBy(a => a.GetType().GetProperty(sortColumn).GetValue(a, null));
+                else
+                    SelectQuery = SelectQuery.OrderByDescending(a => a.GetType().GetProperty(sortColumn).GetValue(a, null));
+            }
+
+            var aaa = SelectQuery.ToQueryString();
 
             var records = await SelectQuery.Skip(start).Take(length).ToListAsync();
             var totalCount = await SelectQuery.CountAsync();

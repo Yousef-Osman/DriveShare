@@ -102,16 +102,18 @@
             let selector = "#uploadedFiles";
             let url = "/MyFiles/GetUploads";
             let columns = [
-                { data: "fileName" },
-                { data: "contentType" },
-                { data: "size" },
-                { data: "downloadCount" },
+                { data: "fileName", name: "fileName" },
+                { data: "contentType", name: "contentType" },
+                { data: "size", name: "size" },
+                { data: "downloadCount", name: "downloadCount" },
                 {
-                    data: "createdOn" ,
+                    data: "createdOn", 
+                    name: "createdOn",
                     render: function (data, type, row) { return formateDate(row.createdOn); },
                 },
                 { 
                     data: "lastModifiedOn", 
+                    name: "lastModifiedOn", 
                     render: function (data, type, row) { return formateDate(row.lastModifiedOn); }, 
                 },
                 {

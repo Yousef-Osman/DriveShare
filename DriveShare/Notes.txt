@@ -4,3 +4,6 @@ https://github.com/DavidSuescunPelegay/jQuery-datatable-server-side-net-core/tre
 https://github.com/ercane99/DatatablesServerSide/blob/master/DatatablesServerSide/Controllers/StudentsController.cs
 https://codewithmukesh.com/blog/jquery-datatable-in-aspnet-core/
 https://github.com/mrlokeshpatidar/Generic-Repository-Pattern-CSharp-DotNet-Core/blob/main/RepositoryPattern/Controllers/UserDetailController.cs
+
+**use reflection to get property name
+https://stackoverflow.com/questions/1689199/c-sharp-code-to-order-by-a-property-using-the-property-name-as-a-string
