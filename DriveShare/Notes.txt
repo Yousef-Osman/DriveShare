@@ -1,0 +1,6 @@
+﻿**Datatable important repositories and links
+
+https://github.com/DavidSuescunPelegay/jQuery-datatable-server-side-net-core/tree/master/src/jQueryDatatableServerSideNetCore
+https://github.com/ercane99/DatatablesServerSide/blob/master/DatatablesServerSide/Controllers/StudentsController.cs
+https://codewithmukesh.com/blog/jquery-datatable-in-aspnet-core/
+https://github.com/mrlokeshpatidar/Generic-Repository-Pattern-CSharp-DotNet-Core/blob/main/RepositoryPattern/Controllers/UserDetailController.cs
