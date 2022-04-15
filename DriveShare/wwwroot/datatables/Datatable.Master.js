@@ -1,4 +1,4 @@
-﻿function getData(selector, url, columns, params = [], dir = null) {
+﻿function getData(selector, url, columns, params = []) {
 
     var table = $(selector).DataTable({
         processing: true,
@@ -8,8 +8,7 @@
         info: true,
         ordering: true,
         filter: true,
-        //order: [],
-        order: dir == null ? [[1, "asc"]] : dir,
+        order: [],
         autoWidth: true,
         ajax: {
             url: url,

@@ -1,6 +1,5 @@
 ﻿using DriveShare.Common;
 using DriveShare.Data;
-using DriveShare.Helpers;
 using DriveShare.Models;
 using DriveShare.Models.Enums;
 using DriveShare.Repositories.Interfaces;
@@ -39,8 +38,8 @@ public class MyFilesController : Controller
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
             var columnOrder = Request.Form["order[0][column]"].FirstOrDefault();
             var sortColumn = Request.Form[string.Concat("columns[", columnOrder, "][name]")].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            //var status = Convert.ToInt32(parameters[0]);
+            var sortDirectionPrm = Request.Form["order[0][dir]"].FirstOrDefault();
+            SortOrder sortDirection = (sortDirectionPrm == "asc") ? SortOrder.Ascending : SortOrder.Descending;
 
             //Main query to select all user active files
             var filesQuery = _context.Files.Where(a => a.UserId == GetUserId() && a.IsDeleted == false).AsQueryable();
@@ -52,12 +51,7 @@ public class MyFilesController : Controller
                                 a.ContentType.ToLower().Contains(searchValue));
             }
 
-            //Sorting records for any given column
-            //if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-            //{
-            //    filesQuery = filesQuery.OrderBy(a => string.Concat(sortColumn, " ", sortColumnDirection));
-            //}
-
+            //select required columns for the viewModel
             var SelectQuery = filesQuery.Select(a => new FileDataViewModel()
             {
                 Id = a.Id,
@@ -71,19 +65,10 @@ public class MyFilesController : Controller
                 LastModifiedOn = a.LastModifiedOn
             });
 
-            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-            {
-                //System.Reflection.PropertyInfo prop = typeof(sortColumn).GetProperty("PropertyName");
-
-                //query = query.OrderBy(x => prop.GetValue(x, null));
-
-                if (sortColumnDirection == "asc")
-                    SelectQuery = SelectQuery.OrderBy(a => a.GetType().GetProperty(sortColumn).GetValue(a, null));
-                else
-                    SelectQuery = SelectQuery.OrderByDescending(a => a.GetType().GetProperty(sortColumn).GetValue(a, null));
-            }
-
-            var aaa = SelectQuery.ToQueryString();
+            //If sort column is not defined, sort by creation date (desc)
+            SelectQuery = (!string.IsNullOrEmpty(sortColumn)) ?
+                SelectQuery.OrderByDynamic(sortColumn, sortDirection) :
+                SelectQuery.OrderByDescending(a => a.CreatedOn);
 
             var records = await SelectQuery.Skip(start).Take(length).ToListAsync();
             var totalCount = await SelectQuery.CountAsync();

@@ -7,3 +7,6 @@ https://github.com/mrlokeshpatidar/Generic-Repository-Pattern-CSharp-DotNet-Core
 
 **use reflection to get property name
 https://stackoverflow.com/questions/1689199/c-sharp-code-to-order-by-a-property-using-the-property-name-as-a-string
+
+**For UI
+https://coursearly.com/cursus/public/
