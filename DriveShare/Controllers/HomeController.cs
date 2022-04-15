@@ -1,4 +1,6 @@
 ﻿using DriveShare.Data;
+using DriveShare.Models.Enums;
+using DriveShare.Repositories.Interfaces;
 using DriveShare.ViewModels;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,23 +11,23 @@ namespace DriveShare.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly ILogger<HomeController> _logger;
+    private readonly IFileData _fileDataRepo;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<HomeController> _logger;
+    private readonly string SortColumn = "CreatedOn";
 
-    public HomeController(ApplicationDbContext context,
-                          ILogger<HomeController> logger,
-                          IWebHostEnvironment env)
+    public HomeController(IFileData fileDataRepo,
+                          IWebHostEnvironment env,
+                          ILogger<HomeController> logger)
     {
-        _context = context;
         _logger = logger;
         _env = env;
+        _fileDataRepo = fileDataRepo;
     }
 
     public async Task<IActionResult> Index()
     {
-        var files = await GetAllFiles().OrderByDescending(a => a.DownloadCount).ThenByDescending(a => a.LastDownloaded)
-                    .Take(4).ToListAsync();
+        var files = await _fileDataRepo.GetLatestFilesAsync();
         return View(files);
     }
 
@@ -43,53 +45,34 @@ public class HomeController : Controller
 
     public async Task<IActionResult> SearchFiles(string searchValue)
     {
-        var files = await GetAllFiles(searchValue).OrderByDescending(a => a.CreatedOn).ToListAsync();
+        var start = 0;
+        var length = 10;
+
+        var filesQuery = _fileDataRepo.GetAllFilesQuery(SortColumn, SortOrder.Descending, searchValue);
+        var files = await _fileDataRepo.GetFilteredAsync(filesQuery, start, length);
+
         return View(files);
     }
 
     public async Task<IActionResult> BrowseFiles()
     {
-        var files = await GetAllFiles().OrderByDescending(a => a.CreatedOn).ToListAsync();
+        var start = 0;
+        var length = 10;
+
+        var filesQuery = _fileDataRepo.GetAllFilesQuery(SortColumn, SortOrder.Descending, null);
+        var files = await _fileDataRepo.GetFilteredAsync(filesQuery, start, length);
+
         return View(files);
-    }
-
-
-
-    private IQueryable<FileDataViewModel> GetAllFiles(string searchValue = null)
-    {
-        IQueryable<FileDataViewModel> fileQuery = _context.Files.Where(a => a.IsDeleted == false &&
-            (string.IsNullOrEmpty(searchValue) ? true : a.FileName.ToLower().Contains(searchValue.ToLower())))
-            .Select(a => new FileDataViewModel()
-            {
-                Id = a.Id,
-                FileName = a.FileName,
-                FileSerial = a.FileSerial,
-                ContentType = a.ContentType,
-                Description = a.Description,
-                DownloadCount = a.DownloadCount,
-                Size = a.Size,
-                CreatedOn = a.CreatedOn,
-                LastModifiedOn = a.LastModifiedOn,
-                LastDownloaded = a.LastDownloaded
-            }).AsQueryable();
-
-        return fileQuery;
     }
 
     public async Task<IActionResult> DownloadFile(string id)
     {
         try
         {
-            var file = await _context.Files.FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted == false && a.IsPrivate == false);
+            var file = await _fileDataRepo.DownloadFileAsync(id);
 
             if (file == null)
                 return NotFound();
-
-            file.DownloadCount++;
-            file.LastDownloaded = DateTime.Now;
-
-            _context.Update(file);
-            _context.SaveChanges();
 
             Response.Headers.Add("Expires", DateTime.Now.AddDays(-3).ToLongDateString());
             Response.Headers.Add("Cache-Control", "no-cache");
