@@ -1,21 +1,24 @@
-﻿using DriveShare.Common;
+﻿using DriveShare.Helpers;
 using DriveShare.Data;
 using DriveShare.Models;
 using DriveShare.Models.Enums;
 using DriveShare.Repositories.Interfaces;
 using DriveShare.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace DriveShare.Repositories;
 public class FIleDataRepository : IFileData
 {
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _env;
+    private readonly IMapper _mapper;
 
-    public FIleDataRepository(ApplicationDbContext context, IWebHostEnvironment env)
+    public FIleDataRepository(ApplicationDbContext context, IWebHostEnvironment env, IMapper mapper)
     {
         _context = context;
         _env = env;
+        _mapper = mapper;
     }
 
     public async Task<FileData> GetFileAsync(string id)

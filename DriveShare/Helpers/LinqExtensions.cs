@@ -1,7 +1,7 @@
 ﻿using DriveShare.Models.Enums;
 using System.Linq.Expressions;
 
-namespace DriveShare.Common;
+namespace DriveShare.Helpers;
 
 public static class LinqExtensions
 {

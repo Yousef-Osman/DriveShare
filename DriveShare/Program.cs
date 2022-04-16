@@ -20,6 +20,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
 
 builder.Services.AddScoped<IFileData, FIleDataRepository>();
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
     // Password settings.
