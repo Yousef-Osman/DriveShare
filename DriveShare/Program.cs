@@ -1,3 +1,4 @@
+using DriveShare.Areas.Admin;
 using DriveShare.Data;
 using DriveShare.Repositories;
 using DriveShare.Repositories.Interfaces;
@@ -19,6 +20,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IFileData, FIleDataRepository>();
+builder.Services.AddAdminServices();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
