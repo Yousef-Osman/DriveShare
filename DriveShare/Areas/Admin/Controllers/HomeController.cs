@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace DriveShare.Areas.Admin.Controllers
+namespace DriveShare.Areas.Admin.Controllers;
+
+public class HomeController : AdminBaseController
 {
-    public class HomeController : AdminBaseController
+    public IActionResult Index()
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View();
     }
 }

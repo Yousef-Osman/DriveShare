@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DriveShare.Areas.Admin.ViewModels;
+using DriveShare.Data;
 using DriveShare.Models;
 using DriveShare.ViewModels;
 
@@ -10,5 +12,7 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<FileData, FileDataViewModel>().ReverseMap(); //not used yet
         CreateMap<UploadFileViewModel, FileData>(); //not used yet
+
+        CreateMap<ApplicationUser, UserViewModel>(); //not used yet
     }
 }
