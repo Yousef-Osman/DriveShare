@@ -20,13 +20,13 @@ public class UserRepository : IUser
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserViewModel>> GetUsers(UserStatus userStatus = 0) //if userStatus = 0 get all data
+    public async Task<IEnumerable<UserViewModel>> GetUsersAsync(UserStatus userStatus = 0) //if userStatus = 0 get all data
     {
         return await _context.Users.Where(a => (userStatus == 0) ? true : a.Status == (int)userStatus)
             .ProjectTo<UserViewModel>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<IEnumerable<UserViewModel>> Search(string seearchValue)
+    public async Task<IEnumerable<UserViewModel>> SearchAsync(string seearchValue)
     {
         return await _context.Users
             .Where(a => a.UserName == seearchValue || a.Email == seearchValue ||
@@ -34,7 +34,7 @@ public class UserRepository : IUser
             .ProjectTo<UserViewModel>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<OperationResult> ChangeUserStatus(string id, UserStatus userStatus)
+    public async Task<OperationResult> ChangeUserStatusAsync(string id, UserStatus userStatus)
     {
         var user = await _context.Users.FindAsync(id);
 
@@ -47,7 +47,7 @@ public class UserRepository : IUser
 
         return OperationResult.Succeeded();
     }
-    public async Task<int> GetUsersCount(int month = 0)
+    public async Task<int> GetUsersCountAsync(int month = 0)
     {
         return await _context.Users.CountAsync(a => (month == 0) ? true :
                         (a.CreatedOn.Month == month && a.CreatedOn.Year == DateTime.Now.Year));
